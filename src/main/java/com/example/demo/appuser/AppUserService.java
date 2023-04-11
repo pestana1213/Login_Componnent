@@ -1,10 +1,13 @@
 package com.example.demo.appuser;
 
 
+import com.example.demo.registration.token.ConfirmationToken;
+import com.example.demo.registration.token.ConfirmationTokenService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,6 +21,8 @@ public class AppUserService implements UserDetailsService {
             "user with email %s not found";
 
     private final AppUserRepository appUserRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final ConfirmationTokenService confirmationTokenService;
 
     @Override
     public UserDetails loadUserByUsername(String email)
@@ -28,4 +33,28 @@ public class AppUserService implements UserDetailsService {
                                 String.format(USER_NOT_FOUND_MSG, email)));
     }
 
+    public String signUpUser(AppUser appUser) throws IllegalAccessException {
+        if(appUserRepository
+                .findByEmail(appUser.getEmail())
+                .isPresent())
+        {
+            throw new IllegalAccessException("email already taken");
+        }
+        appUser.setPassword(passwordEncoder.encode(appUser.getPassword()));
+        appUserRepository.save(appUser);
+
+        String tk = UUID.randomUUID().toString();
+        ConfirmationToken token = new ConfirmationToken(
+                tk,
+                LocalDateTime.now(),
+                LocalDateTime.now().plusMinutes(15),
+                appUser
+        );
+        confirmationTokenService.saveConfirmationToken(token);
+        return tk;
+    }
+
+    public void enableAppUser(String email){
+        appUserRepository.enableAppUser(email);
+    }
 }

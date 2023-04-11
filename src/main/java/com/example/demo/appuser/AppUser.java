@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -19,18 +20,11 @@ import java.util.Collections;
 @Entity
 public class AppUser implements UserDetails {
 
-
-    @SequenceGenerator(
-            name = "student_sequence",
-            sequenceName = "student_sequence",
-            allocationSize = 1
-    )
     @Id
     @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "student_sequence"
+            strategy = GenerationType.AUTO
     )
-    private Long id;
+    private UUID id;
     private String firstName;
     private String lastName;
     private String email;
@@ -66,7 +60,7 @@ public class AppUser implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return getFirstName();
     }
 
     public String getFirstName() {

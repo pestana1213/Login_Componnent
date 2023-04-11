@@ -11,8 +11,13 @@ public class RegistrationController {
     private final RegistrationService registrationService;
 
     @PostMapping
-    public String register(@RequestBody RegistrationRequest request) {
+    public String register(@RequestBody RegistrationRequest request) throws IllegalAccessException {
         return registrationService.register(request);
+    }
+
+    @GetMapping("confirm")
+    public String confirm(@RequestParam("token") String token){
+        return registrationService.confirmToken(token);
     }
 
 }

@@ -7,11 +7,12 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 @Transactional(readOnly = true)
 public interface AppUserRepository
-        extends JpaRepository<AppUser, Long> {
+        extends JpaRepository<AppUser, UUID> {
 
     Optional<AppUser> findByEmail(String email);
 
@@ -19,6 +20,6 @@ public interface AppUserRepository
     @Modifying
     @Query("UPDATE AppUser a " +
             "SET a.enabled = TRUE WHERE a.email = ?1")
-    int enableAppUser(String email);
+    void enableAppUser(String email);
 
 }
