@@ -57,4 +57,11 @@ public class AppUserService implements UserDetailsService {
     public void enableAppUser(String email){
         appUserRepository.enableAppUser(email);
     }
+
+    public boolean login(String email, String password){
+        AppUser user = appUserRepository.findByEmail(email).orElseThrow(
+                () -> new IllegalArgumentException("Email not registered on the app")
+        );
+        return passwordEncoder.matches(password, user.getPassword());
+    }
 }
